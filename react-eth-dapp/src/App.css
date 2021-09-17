@@ -1,0 +1,13 @@
+.App {
+  margin: 0 auto;
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+}
+
+.loading-spinner {
+  width: 270px;
+  height: 270px;
+}
