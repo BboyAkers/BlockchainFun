@@ -20,6 +20,7 @@ const App = () => {
     const detectedProvider = new ethers.providers.Web3Provider(window.ethereum, 'any')
     if (detectedProvider) {
       setLoading(false)
+      console.log(detectedProvider)
       setProvider(detectedProvider)
       return;
     }

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ethers } from 'ethers';
+import { ethers, providers } from 'ethers';
 
 import Greeter from '../../artifacts/contracts/Greeter.sol/Greeter.json'
 import './MainContent.css';
@@ -7,32 +7,48 @@ import './MainContent.css';
 const MainContent = ({ provider }) => {
 
   const greeterContractAddress = "0xDc64a140Aa3E981100a9becA4E685f962f0cF6C9"
-  const [greeting, setGreetingMessage] = useState()
+  const [greeting, setGreetingMessage] = useState('')
   const [accounts, setAccounts] = useState();
+  const [text, setText] = useState('')
+  const { ethereum } = window;
+
   const requestAccounts = async () => {
-    const accountList = await provider.request({ method: 'eth_requestAccounts' });
-    setAccounts(accountList);
+    const accountList = await ethereum.request({
+      method: 'eth_requestAccounts',
+    })
+    if (accountList) {
+      setAccounts(accountList);
+      return;
+    }
+    throw new Error(accountList)
   }
 
   const fetchGreeting = async () => {
     try {
       const contract = new ethers.Contract(greeterContractAddress, Greeter.abi, provider)
       const contractData = await contract.greet()
-      console.log("contract data:", contractData)
+      setText(`Contract Greeting Message: ${contractData}`)
     }
     catch (error) {
-      console.error(error)
+      setText(error)
     }
   }
 
   const updateGreeting = async () => {
     if (!greeting) return
-    await requestAccounts()
-    const signer = provider.getSigner();
-    const updatedContract = new ethers.Contract(greeterContractAddress, Greeter.abi, signer);
-    const transaction = await updatedContract.setGreetingMessage(greeting)
-    await transaction.wait()
-    fetchGreeting()
+
+    try {
+      await requestAccounts()
+      const signer = provider.getSigner();
+      const updatedContract = new ethers.Contract(greeterContractAddress, Greeter.abi, signer);
+      const transaction = await updatedContract.setGreeting(greeting)
+      setGreetingMessage('')
+      setText('')
+      await transaction.wait()
+      fetchGreeting()
+    } catch (error) {
+      setText(error.message)
+    }
   }
 
   return (
@@ -44,6 +60,7 @@ const MainContent = ({ provider }) => {
         onChange={e => setGreetingMessage(e.target.value)}
         placeholder="Enter Text to set greeting"
       />
+      <p>{text}</p>
     </div>
   )
 };
