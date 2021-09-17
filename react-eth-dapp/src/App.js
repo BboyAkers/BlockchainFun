@@ -17,14 +17,14 @@ const App = () => {
   }, []);
 
   const checkEthereumProvider = async () => {
-    const detectedProvider = new ethers.providers.Web3Provider(window.ethereum, 'any')
-    if (detectedProvider) {
+    try {
+      const detectedProvider = new ethers.providers.Web3Provider(window.ethereum, 'any')
       setLoading(false)
-      console.log(detectedProvider)
       setProvider(detectedProvider)
-      return;
+    } catch (error) {
+      setLoading(false)
+      setProvider(false)
     }
-    console.error("Provider Not Detected");
   }
 
 
