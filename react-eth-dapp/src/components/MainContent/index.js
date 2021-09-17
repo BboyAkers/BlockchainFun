@@ -15,8 +15,8 @@ const MainContent = ({ provider }) => {
   }
 
   const fetchGreeting = async () => {
-    const contract = new ethers.Contract(greeterContractAddress, Greeter.abi, provider)
     try {
+      const contract = new ethers.Contract(greeterContractAddress, Greeter.abi, provider)
       const contractData = await contract.greet()
       console.log("contract data:", contractData)
     }
