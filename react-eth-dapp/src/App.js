@@ -18,12 +18,12 @@ const App = () => {
 
   const checkEthereumProvider = async () => {
     try {
-      const detectedProvider = new ethers.providers.Web3Provider(window.ethereum, 'any')
-      setLoading(false)
-      setProvider(detectedProvider)
+      const detectedProvider = new ethers.providers.Web3Provider(window.ethereum, 'any');
+      setLoading(false);
+      setProvider(detectedProvider);
     } catch (error) {
-      setLoading(false)
-      setProvider(false)
+      setLoading(false);
+      setProvider(false);
     }
   }
 
