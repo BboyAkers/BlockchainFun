@@ -6,61 +6,62 @@ import './MainContent.css';
 
 const MainContent = ({ provider }) => {
 
-  const greeterContractAddress = "0xDc64a140Aa3E981100a9becA4E685f962f0cF6C9"
-  const [greeting, setGreetingMessage] = useState('')
-  const [accounts, setAccounts] = useState();
-  const [text, setText] = useState('')
+  const greeterContractAddress = "0x5FbDB2315678afecb367f032d93F642f64180aa3";
+  const [greeting, setGreetingMessage] = useState('');
+  const [account, setAccount] = useState();
+  const [text, setText] = useState('');
   const { ethereum } = window;
 
   const requestAccounts = async () => {
-    const accountList = await ethereum.request({
+    const requestedAccount = await ethereum.request({
       method: 'eth_requestAccounts',
-    })
-    if (accountList) {
-      setAccounts(accountList);
+    });
+    if (requestedAccount[0].length) {
+      setAccount(requestedAccount);
+      console.log(account)
       return;
     }
-    throw new Error(accountList)
+    throw new Error(requestedAccount);
   }
 
   const fetchGreeting = async () => {
     try {
-      const contract = new ethers.Contract(greeterContractAddress, Greeter.abi, provider)
-      const contractData = await contract.greet()
-      setText(`Contract Greeting Message: ${contractData}`)
+      const contract = new ethers.Contract(greeterContractAddress, Greeter.abi, provider);
+      const contractData = await contract.greet();
+      setText(`Contract Greeting Message: ${contractData}`);
     }
     catch (error) {
-      setText(error)
+      setText(error.message);
     }
   }
 
   const updateGreeting = async () => {
-    if (!greeting) return
+    if (!greeting) return;
 
     try {
-      await requestAccounts()
+      await requestAccounts();
       const signer = provider.getSigner();
       const updatedContract = new ethers.Contract(greeterContractAddress, Greeter.abi, signer);
-      const transaction = await updatedContract.setGreeting(greeting)
-      setGreetingMessage('')
-      setText('')
-      await transaction.wait()
-      fetchGreeting()
+      const transaction = await updatedContract.setGreeting(greeting);
+      setGreetingMessage('');
+      await transaction.wait();
+      fetchGreeting();
     } catch (error) {
-      setText(error.message)
+      setText(error.message);
     }
   }
 
   return (
     <div>
-      <h1>Main Content Loaded</h1>
-      <button onClick={fetchGreeting}>Fetch Greeting</button>
-      <button onClick={updateGreeting}>Update Greeting</button>
+      <h1>Greeting Dapp</h1>
+      <p><strong>{text}</strong></p>
+      <button className="waves-effect waves-light btn" onClick={fetchGreeting}>Fetch Greeting</button>
       <input
+        className="validate"
         onChange={e => setGreetingMessage(e.target.value)}
         placeholder="Enter Text to set greeting"
       />
-      <p>{text}</p>
+      <button className="btn waves-effect waves-light" onClick={updateGreeting}>Update Greeting<i className="material-icons right">send</i></button>
     </div>
   )
 };
